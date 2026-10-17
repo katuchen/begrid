@@ -1,6 +1,5 @@
 import UIKit
 
-// NSCache is thread-safe and both stored properties are immutable.
 nonisolated final class MemoryImageCache: @unchecked Sendable {
     private let cache = NSCache<NSString, UIImage>()
     private let notificationCenter: NotificationCenter
