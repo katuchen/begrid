@@ -6,6 +6,16 @@ actor StubHTTPClient: HTTPClient {
     enum Response: Sendable {
         case success(Data, status: Int = 200, headers: [String: String] = [:])
         case failure(any Error)
+
+        func result(for request: URLRequest) throws -> (Data, HTTPURLResponse) {
+            switch self {
+            case let .success(data, status, headers):
+                let url = try #require(request.url)
+                return (data, try StubHTTPClient.httpResponse(url: url, status: status, headers: headers))
+            case let .failure(error):
+                throw error
+            }
+        }
     }
 
     private let response: Response
@@ -17,13 +27,7 @@ actor StubHTTPClient: HTTPClient {
 
     func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         requests.append(request)
-        switch response {
-        case let .success(data, status, headers):
-            let url = try #require(request.url)
-            return (data, try Self.httpResponse(url: url, status: status, headers: headers))
-        case let .failure(error):
-            throw error
-        }
+        return try response.result(for: request)
     }
 
     static func httpResponse(
