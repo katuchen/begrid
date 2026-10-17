@@ -14,19 +14,11 @@
 			remoteGlobalIDString = 0B9520E830836E6B00C1B130;
 			remoteInfo = BeGrid;
 		};
-		0B95210130836E6C00C1B130 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0B9520E130836E6A00C1B130 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 0B9520E830836E6B00C1B130;
-			remoteInfo = BeGrid;
-		};
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
 		0B9520E930836E6B00C1B130 /* BeGrid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeGrid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9520F630836E6C00C1B130 /* BeGridTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeGridTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		0B95210030836E6C00C1B130 /* BeGridUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeGridUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -38,11 +30,6 @@
 		0B9520F930836E6C00C1B130 /* BeGridTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = BeGridTests;
-			sourceTree = "<group>";
-		};
-		0B95210330836E6C00C1B130 /* BeGridUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = BeGridUITests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -58,11 +45,6 @@
 			files = (
 			);
 		};
-		0B9520FD30836E6C00C1B130 /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			files = (
-			);
-		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -71,7 +53,6 @@
 			children = (
 				0B9520EB30836E6B00C1B130 /* BeGrid */,
 				0B9520F930836E6C00C1B130 /* BeGridTests */,
-				0B95210330836E6C00C1B130 /* BeGridUITests */,
 				0B9520EA30836E6B00C1B130 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -81,7 +62,6 @@
 			children = (
 				0B9520E930836E6B00C1B130 /* BeGrid.app */,
 				0B9520F630836E6C00C1B130 /* BeGridTests.xctest */,
-				0B95210030836E6C00C1B130 /* BeGridUITests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -128,27 +108,6 @@
 			productReference = 0B9520F630836E6C00C1B130 /* BeGridTests.xctest */;
 			productType = "com.apple.product-type.bundle.unit-test";
 		};
-		0B9520FF30836E6C00C1B130 /* BeGridUITests */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = 0B95210E30836E6C00C1B130 /* Build configuration list for PBXNativeTarget "BeGridUITests" */;
-			buildPhases = (
-				0B9520FC30836E6C00C1B130 /* Sources */,
-				0B9520FD30836E6C00C1B130 /* Frameworks */,
-				0B9520FE30836E6C00C1B130 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-				0B95210230836E6C00C1B130 /* PBXTargetDependency */,
-			);
-			fileSystemSynchronizedGroups = (
-				0B95210330836E6C00C1B130 /* BeGridUITests */,
-			);
-			name = BeGridUITests;
-			productName = BeGridUITests;
-			productReference = 0B95210030836E6C00C1B130 /* BeGridUITests.xctest */;
-			productType = "com.apple.product-type.bundle.ui-testing";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -163,10 +122,6 @@
 						CreatedOnToolsVersion = 27.1;
 					};
 					0B9520F530836E6C00C1B130 = {
-						CreatedOnToolsVersion = 27.1;
-						TestTargetID = 0B9520E830836E6B00C1B130;
-					};
-					0B9520FF30836E6C00C1B130 = {
 						CreatedOnToolsVersion = 27.1;
 						TestTargetID = 0B9520E830836E6B00C1B130;
 					};
@@ -188,7 +143,6 @@
 			targets = (
 				0B9520E830836E6B00C1B130 /* BeGrid */,
 				0B9520F530836E6C00C1B130 /* BeGridTests */,
-				0B9520FF30836E6C00C1B130 /* BeGridUITests */,
 			);
 		};
 /* End PBXProject section */
@@ -200,11 +154,6 @@
 			);
 		};
 		0B9520F430836E6C00C1B130 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			files = (
-			);
-		};
-		0B9520FE30836E6C00C1B130 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			files = (
 			);
@@ -222,11 +171,6 @@
 			files = (
 			);
 		};
-		0B9520FC30836E6C00C1B130 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			files = (
-			);
-		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -234,11 +178,6 @@
 			isa = PBXTargetDependency;
 			target = 0B9520E830836E6B00C1B130 /* BeGrid */;
 			targetProxy = 0B9520F730836E6C00C1B130 /* PBXContainerItemProxy */;
-		};
-		0B95210230836E6C00C1B130 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 0B9520E830836E6B00C1B130 /* BeGrid */;
-			targetProxy = 0B95210130836E6C00C1B130 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -296,7 +235,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -354,7 +293,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -374,25 +313,31 @@
 				DEVELOPMENT_TEAM = 7GM3H24NB9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = BeGrid;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGrid.BeGrid;
+				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGrid;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -406,25 +351,31 @@
 				DEVELOPMENT_TEAM = 7GM3H24NB9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = BeGrid;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGrid.BeGrid;
+				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGrid;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
@@ -436,16 +387,20 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7GM3H24NB9;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGrid.BeGridTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGridTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BeGrid.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BeGrid";
 			};
 			name = Debug;
@@ -458,57 +413,21 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 7GM3H24NB9;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGrid.BeGridTests;
+				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGridTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				SWIFT_VERSION = 6.0;
+				TARGETED_DEVICE_FAMILY = 1;
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/BeGrid.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/BeGrid";
-			};
-			name = Release;
-		};
-		0B95210F30836E6C00C1B130 /* Debug configuration for PBXNativeTarget "BeGridUITests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 7GM3H24NB9;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGrid.BeGridUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = BeGrid;
-			};
-			name = Debug;
-		};
-		0B95211030836E6C00C1B130 /* Release configuration for PBXNativeTarget "BeGridUITests" */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 7GM3H24NB9;
-				GENERATE_INFOPLIST_FILE = YES;
-				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = com.katuchen.BeGrid.BeGridUITests;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				STRING_CATALOG_GENERATE_SYMBOLS = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = NO;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				TEST_TARGET_NAME = BeGrid;
 			};
 			name = Release;
 		};
@@ -536,14 +455,6 @@
 			buildConfigurations = (
 				0B95210C30836E6C00C1B130 /* Debug configuration for PBXNativeTarget "BeGridTests" */,
 				0B95210D30836E6C00C1B130 /* Release configuration for PBXNativeTarget "BeGridTests" */,
-			);
-			defaultConfigurationName = Release;
-		};
-		0B95210E30836E6C00C1B130 /* Build configuration list for PBXNativeTarget "BeGridUITests" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				0B95210F30836E6C00C1B130 /* Debug configuration for PBXNativeTarget "BeGridUITests" */,
-				0B95211030836E6C00C1B130 /* Release configuration for PBXNativeTarget "BeGridUITests" */,
 			);
 			defaultConfigurationName = Release;
 		};
