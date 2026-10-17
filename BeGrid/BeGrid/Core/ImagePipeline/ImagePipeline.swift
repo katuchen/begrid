@@ -24,9 +24,10 @@ actor ImagePipeline: ImageLoading {
     init(
         client: any HTTPClient = URLSessionHTTPClient(session: URLSessionHTTPClient.makeSession(cachesResponses: false)),
         options: PipelineOptions = PipelineOptions(),
-        memoryCache: MemoryImageCache = MemoryImageCache()
+        memoryCache: MemoryImageCache = MemoryImageCache(),
+        diskCache: DiskImageCache = DiskImageCache()
     ) {
-        fetcher = ImageFetcher(client: client)
+        fetcher = ImageFetcher(client: client, diskCache: options.diskCache ? diskCache : nil)
         self.options = options
         self.memoryCache = memoryCache
     }
@@ -47,6 +48,11 @@ actor ImagePipeline: ImageLoading {
     nonisolated func cachedImage(for url: URL, targetPixelSize: PixelSize) -> UIImage? {
         guard options.memoryCache else { return nil }
         return memoryCache.image(for: Key(url: url, size: targetPixelSize).cacheKey)
+    }
+
+    func prefetchImage(for url: URL, targetPixelSize: PixelSize) async {
+        guard options.prefetch else { return }
+        _ = try? await image(for: url, targetPixelSize: targetPixelSize)
     }
 
     func waiterCount(for url: URL, targetPixelSize: PixelSize) -> Int {

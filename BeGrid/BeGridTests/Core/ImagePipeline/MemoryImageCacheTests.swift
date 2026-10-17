@@ -8,12 +8,13 @@ struct MemoryImageCacheTests {
         try #require(UIImage(data: ImageFixture.png(width: 40, height: 30)))
     }
 
-    @Test func memoryWarningClearsCache() throws {
+    @Test(arguments: [UIApplication.didReceiveMemoryWarningNotification, UIApplication.didEnterBackgroundNotification])
+    func notificationClearsCache(name: Notification.Name) throws {
         let center = NotificationCenter()
         let cache = MemoryImageCache(notificationCenter: center)
         cache.insert(try makeImage(), for: "photo")
 
-        center.post(name: UIApplication.didReceiveMemoryWarningNotification, object: nil)
+        center.post(name: name, object: nil)
 
         #expect(cache.image(for: "photo") == nil)
     }

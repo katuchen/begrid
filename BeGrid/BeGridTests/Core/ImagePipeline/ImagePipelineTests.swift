@@ -6,6 +6,7 @@ import UIKit
 struct ImagePipelineTests {
     private let url = URL(filePath: "/photo.jpg")
     private let size = PixelSize(width: 100, height: 100)
+    private let directory = TemporaryDirectory.make()
 
     private func makePipeline(
         _ response: StubHTTPClient.Response? = nil,
@@ -13,7 +14,7 @@ struct ImagePipelineTests {
         options: PipelineOptions = PipelineOptions()
     ) throws -> (ImagePipeline, GatedHTTPClient) {
         let client = try GatedHTTPClient(response ?? .success(ImageFixture.png(width: 400, height: 300)), isOpen: isOpen)
-        return (ImagePipeline(client: client, options: options), client)
+        return (ImagePipeline(client: client, options: options, diskCache: DiskImageCache(directory: directory)), client)
     }
 
     @Test func concurrentRequestsShareOneDownload() async throws {
@@ -90,12 +91,56 @@ struct ImagePipelineTests {
     }
 
     @Test func disabledMemoryCacheRefetches() async throws {
-        let (pipeline, client) = try makePipeline(options: PipelineOptions(memoryCache: false))
+        let (pipeline, client) = try makePipeline(options: PipelineOptions(memoryCache: false, diskCache: false))
         _ = try await pipeline.image(for: url, targetPixelSize: size)
         _ = try await pipeline.image(for: url, targetPixelSize: size)
 
         #expect(pipeline.cachedImage(for: url, targetPixelSize: size) == nil)
         #expect(await client.requestCount == 2)
+    }
+
+    @Test func memoryCacheMissFallsBackToDisk() async throws {
+        let (first, _) = try makePipeline()
+        _ = try await first.image(for: url, targetPixelSize: size)
+
+        let (second, client) = try makePipeline()
+        _ = try await second.image(for: url, targetPixelSize: size)
+
+        #expect(await client.requestCount == 0)
+    }
+
+    @Test func disabledDiskCacheRefetches() async throws {
+        let (first, _) = try makePipeline()
+        _ = try await first.image(for: url, targetPixelSize: size)
+
+        let (second, client) = try makePipeline(options: PipelineOptions(diskCache: false))
+        _ = try await second.image(for: url, targetPixelSize: size)
+
+        #expect(await client.requestCount == 1)
+    }
+
+    @Test func undecodableDataIsNotStoredOnDisk() async throws {
+        let (pipeline, _) = try makePipeline(.success(Data("nope".utf8)))
+        _ = try? await pipeline.image(for: url, targetPixelSize: size)
+
+        let (second, client) = try makePipeline()
+        _ = try await second.image(for: url, targetPixelSize: size)
+
+        #expect(await client.requestCount == 1)
+    }
+
+    @Test func prefetchFillsMemoryCache() async throws {
+        let (pipeline, _) = try makePipeline()
+        await pipeline.prefetchImage(for: url, targetPixelSize: size)
+
+        #expect(pipeline.cachedImage(for: url, targetPixelSize: size) != nil)
+    }
+
+    @Test func disabledPrefetchDoesNothing() async throws {
+        let (pipeline, client) = try makePipeline(options: PipelineOptions(prefetch: false))
+        await pipeline.prefetchImage(for: url, targetPixelSize: size)
+
+        #expect(await client.requestCount == 0)
     }
 
     @Test func failedLoadIsNotCached() async throws {
