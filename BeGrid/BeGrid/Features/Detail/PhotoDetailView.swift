@@ -42,6 +42,7 @@ struct PhotoDetailView: View {
                 onPhotoChange(id)
             }
         }
+        .accessibilityAction(.escape, close)
         .onAppear {
             withAnimation(.easeOut(duration: 0.25)) {
                 isPresented = true
@@ -59,7 +60,7 @@ struct PhotoDetailView: View {
                     }
                     .containerRelativeFrame([.horizontal, .vertical])
                     .accessibilityElement(children: .ignore)
-                    .accessibilityLabel(photo.summary)
+                    .accessibilityLabel(photo.accessibilityLabel)
                     .accessibilityAddTraits(.isImage)
                 }
             }

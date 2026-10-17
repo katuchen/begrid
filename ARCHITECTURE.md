@@ -33,7 +33,7 @@ ImagePipeline: a standalone subsystem used by views
 | `App/` | Entry point, root view, composition root, configuration |
 | `Core/Models/` | Domain types and the mapping from API types |
 | `Core/Networking/` | HTTP transport and Unsplash endpoint definitions |
-| `Core/Data/` | Repositories: the single source of photo data (remote, later offline) |
+| `Core/Data/` | Repositories: the single source of photo data |
 | `Core/ImagePipeline/` | Image loading, caching, and sizing |
 | `Features/<Name>/` | One folder per screen or shared feature (`Grid`, `Feed`, `Search`, `Detail`) |
 | `DesignSystem/` | Reusable visual components with no business logic |
@@ -56,9 +56,8 @@ Image loading drives most of the app's performance, so it is a dedicated compone
 
 - deduplicating requests
 - cancelling work that is no longer needed
-- memory and disk caching
+- memory caching
 - downsampling to display size
-- prefetching
 
 Views ask for an image at a size. How it is produced is hidden from them.
 

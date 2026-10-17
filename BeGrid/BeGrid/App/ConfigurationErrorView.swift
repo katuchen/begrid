@@ -14,7 +14,7 @@ struct ConfigurationErrorView: View {
     private var message: String {
         switch error {
         case .missingAccessKey:
-            "Copy Config/Secrets.example.xcconfig to Config/Secrets.xcconfig, add your Unsplash Access Key, and rebuild."
+            "Copy BeGrid/Config/Secrets.example.xcconfig to BeGrid/Config/Secrets.xcconfig, add your Unsplash Access Key, and rebuild."
         }
     }
 }

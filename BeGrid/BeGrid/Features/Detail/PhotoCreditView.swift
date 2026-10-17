@@ -12,8 +12,8 @@ struct PhotoCreditView: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
-            if photo.summary != PhotoMapper.untitledSummary {
-                Text(photo.summary)
+            if let summary = photo.summary {
+                Text(summary)
                     .font(.subheadline)
                     .lineLimit(3)
             }

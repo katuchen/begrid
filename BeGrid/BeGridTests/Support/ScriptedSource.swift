@@ -45,6 +45,7 @@ extension Page {
 extension Photo {
     static func stub(
         id: String,
+        summary: String? = nil,
         size: PixelSize? = nil,
         blurHash: String? = nil,
         averageColor: String? = nil
@@ -52,7 +53,7 @@ extension Photo {
         let url = URL(string: "https://images.unsplash.com/\(id)?ixid=abc") ?? URL(filePath: "/")
         return Photo(
             id: id,
-            summary: "Photo \(id)",
+            summary: summary,
             size: size,
             blurHash: blurHash,
             averageColor: averageColor,

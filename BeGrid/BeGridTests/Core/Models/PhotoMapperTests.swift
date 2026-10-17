@@ -5,7 +5,7 @@ struct PhotoMapperTests {
     struct SummaryCase: Sendable, CustomTestStringConvertible {
         let altDescription: String?
         let description: String?
-        let expected: String
+        let expected: String?
 
         var testDescription: String {
             "alt: \(altDescription.debugDescription), description: \(description.debugDescription)"
@@ -18,8 +18,8 @@ struct PhotoMapperTests {
         SummaryCase(altDescription: "", description: "desc", expected: "desc"),
         SummaryCase(altDescription: "  \n", description: "desc", expected: "desc"),
         SummaryCase(altDescription: "  alt  ", description: nil, expected: "alt"),
-        SummaryCase(altDescription: nil, description: nil, expected: PhotoMapper.untitledSummary),
-        SummaryCase(altDescription: " ", description: "\t", expected: PhotoMapper.untitledSummary)
+        SummaryCase(altDescription: nil, description: nil, expected: nil),
+        SummaryCase(altDescription: " ", description: "\t", expected: nil)
     ])
     func summaryFallsBackInOrder(_ testCase: SummaryCase) {
         let summary = PhotoMapper.summary(altDescription: testCase.altDescription, description: testCase.description)

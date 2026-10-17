@@ -25,6 +25,11 @@ struct PhotoCellModelTests {
         #expect(Color(hex: hex) == nil)
     }
 
+    @Test func accessibilityLabelFallsBackToPhotographer() {
+        #expect(PhotoCellModel(photo: .stub(id: "a", summary: "A lake")).accessibilityLabel == "A lake")
+        #expect(PhotoCellModel(photo: .stub(id: "a")).accessibilityLabel == "Photo by Name")
+    }
+
     @Test func missingColorFallsBackToPlaceholder() {
         #expect(PhotoCellModel(photo: .stub(id: "a", averageColor: "nope")).color == .photoPlaceholder)
     }

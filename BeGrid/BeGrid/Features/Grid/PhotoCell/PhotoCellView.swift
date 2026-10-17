@@ -18,17 +18,20 @@ struct PhotoCellView: View, nonisolated Equatable {
                 )
             }
             .overlay(alignment: .bottom) {
-                caption
+                if let summary = model.summary {
+                    caption(summary)
+                }
             }
             .contentShape(Rectangle())
             .accessibilityElement(children: .ignore)
-            .accessibilityLabel(model.summary)
+            .accessibilityLabel(model.accessibilityLabel)
             .accessibilityAddTraits(.isImage)
     }
 
-    private var caption: some View {
-        Text(model.summary)
+    private func caption(_ summary: String) -> some View {
+        Text(summary)
             .font(.caption)
+            .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             .foregroundStyle(.white)
             .lineLimit(2)
             .frame(maxWidth: .infinity, alignment: .leading)

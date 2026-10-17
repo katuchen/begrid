@@ -2,7 +2,8 @@ import SwiftUI
 
 nonisolated struct PhotoCellModel: Identifiable, Equatable {
     let id: Photo.ID
-    let summary: String
+    let summary: String?
+    let accessibilityLabel: String
     let url: URL
     let blurHash: String?
     let color: Color
@@ -11,6 +12,7 @@ nonisolated struct PhotoCellModel: Identifiable, Equatable {
     init(photo: Photo) {
         id = photo.id
         summary = photo.summary
+        accessibilityLabel = photo.accessibilityLabel
         url = photo.urls.regular
         blurHash = photo.blurHash
         color = photo.averageColor.flatMap(Color.init(hex:)) ?? .photoPlaceholder
