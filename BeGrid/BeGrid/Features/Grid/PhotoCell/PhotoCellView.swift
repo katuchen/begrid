@@ -35,6 +35,6 @@ struct PhotoCellView: View, nonisolated Equatable {
             .padding(.horizontal, 8)
             .padding(.top, 24)
             .padding(.bottom, 8)
-            .background(LinearGradient(colors: [.clear, .black.opacity(0.6)], startPoint: .top, endPoint: .bottom))
+            .background(LinearGradient.captionScrim)
     }
 }

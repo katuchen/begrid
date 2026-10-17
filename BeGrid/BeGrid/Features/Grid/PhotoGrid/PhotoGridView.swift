@@ -6,6 +6,8 @@ struct PhotoGridView<Empty: View>: View {
 
     @Environment(\.displayScale) private var displayScale
     @State private var width: CGFloat = 0
+    @State private var detail: PhotoDetailRoute?
+    @Namespace private var zoomNamespace
 
     init(model: PhotoGridViewModel, @ViewBuilder empty: () -> Empty) {
         self.model = model
@@ -15,7 +17,7 @@ struct PhotoGridView<Empty: View>: View {
     var body: some View {
         content
             .task(id: ObjectIdentifier(model)) {
-                await model.loadNextPage()
+                await model.loadFirstPage()
             }
     }
 
@@ -43,22 +45,36 @@ struct PhotoGridView<Empty: View>: View {
     private var cellPixelSize: PixelSize? {
         let cellWidth = (width - PhotoGridLayout.spacing) / 2
         guard cellWidth > 0 else { return nil }
-        return PixelSize(
-            width: Int((cellWidth * displayScale).rounded(.up)),
-            height: Int((cellWidth / PhotoCellView.aspectRatio * displayScale).rounded(.up))
-        )
+        return PixelSize(points: CGSize(width: cellWidth, height: cellWidth / PhotoCellView.aspectRatio), scale: displayScale)
     }
 
     private var grid: some View {
+        ScrollViewReader { proxy in
+            scrollView
+                .fullScreenCover(item: $detail) { route in
+                    PhotoDetailView(route: route, namespace: zoomNamespace) { id in
+                        proxy.scrollTo(id, anchor: .center)
+                    }
+                }
+        }
+    }
+
+    private var scrollView: some View {
         ScrollView {
             LazyVGrid(columns: PhotoGridLayout.columns, spacing: PhotoGridLayout.spacing) {
                 if let cellPixelSize {
                     ForEach(model.items) { photo in
-                        PhotoCellView(model: PhotoCellModel(photo: photo), pixelSize: cellPixelSize)
-                            .equatable()
-                            .onAppear {
-                                model.onItemAppear(photo.id)
-                            }
+                        Button {
+                            open(photo, previewPixelSize: cellPixelSize)
+                        } label: {
+                            PhotoCellView(model: PhotoCellModel(photo: photo), pixelSize: cellPixelSize)
+                                .equatable()
+                        }
+                        .buttonStyle(.plain)
+                        .zoomTransitionSource(id: photo.id, in: zoomNamespace)
+                        .onAppear {
+                            model.onItemAppear(photo.id)
+                        }
                     }
                 }
             }
@@ -67,6 +83,12 @@ struct PhotoGridView<Empty: View>: View {
         .onGeometryChange(for: CGFloat.self) { $0.size.width } action: { width = $0 }
         .refreshable {
             await model.refresh()
+        }
+    }
+
+    private func open(_ photo: Photo, previewPixelSize: PixelSize) {
+        ZoomTransition.present {
+            detail = PhotoDetailRoute(photos: model.items, selectedID: photo.id, previewPixelSize: previewPixelSize)
         }
     }
 

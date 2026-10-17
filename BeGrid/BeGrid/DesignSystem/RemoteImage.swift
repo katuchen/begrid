@@ -15,6 +15,7 @@ struct RemoteImage: View {
     let targetPixelSize: PixelSize
     let blurHash: String?
     let placeholder: Color
+    var preview: UIImage?
 
     @Environment(\.imageLoader) private var loader
     @State private var loaded: Loaded?
@@ -38,8 +39,8 @@ struct RemoteImage: View {
     var body: some View {
         placeholder
             .overlay {
-                if let blur {
-                    fill(blur)
+                if let backdrop = preview ?? blur {
+                    fill(backdrop)
                 }
             }
             .overlay {
@@ -50,7 +51,7 @@ struct RemoteImage: View {
             }
             .clipped()
             .task(id: blurHash) {
-                guard let blurHash, image == nil else { return }
+                guard let blurHash, preview == nil, image == nil else { return }
                 blur = await BlurHash.decodedImage(from: blurHash)
             }
             .task(id: request) {

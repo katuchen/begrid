@@ -22,6 +22,17 @@ struct PhotoGridViewModelTests {
         #expect(await source.requestedPages == [1, 2])
     }
 
+    @Test func loadingTheFirstPageAgainDoesNothing() async {
+        let source = ScriptedSource(pages: [.of("a"), .of("b")])
+        let model = PhotoGridViewModel(source: source)
+
+        await model.loadFirstPage()
+        await model.loadFirstPage()
+
+        #expect(ids(model) == ["a"])
+        #expect(await source.requestedPages == [1])
+    }
+
     @Test func duplicatesAcrossPagesAreRemoved() async {
         let model = PhotoGridViewModel(source: ScriptedSource(pages: [.of("a", "b", "c"), .of("c", "a", "d")]))
 
