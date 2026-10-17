@@ -1,17 +1,20 @@
 import SwiftUI
 
-struct PhotoGridView: View {
-    static let spacing: CGFloat = 2
-    static let columns = Array(repeating: GridItem(.flexible(), spacing: spacing), count: 2)
-
+struct PhotoGridView<Empty: View>: View {
     let model: PhotoGridViewModel
+    private let empty: Empty
 
     @Environment(\.displayScale) private var displayScale
     @State private var width: CGFloat = 0
 
+    init(model: PhotoGridViewModel, @ViewBuilder empty: () -> Empty) {
+        self.model = model
+        self.empty = empty()
+    }
+
     var body: some View {
         content
-            .task {
+            .task(id: ObjectIdentifier(model)) {
                 await model.loadNextPage()
             }
     }
@@ -30,13 +33,15 @@ struct PhotoGridView: View {
                 retryButton
                     .buttonStyle(.borderedProminent)
             }
+        case (.exhausted, true):
+            empty
         default:
             grid
         }
     }
 
     private var cellPixelSize: PixelSize? {
-        let cellWidth = (width - Self.spacing) / 2
+        let cellWidth = (width - PhotoGridLayout.spacing) / 2
         guard cellWidth > 0 else { return nil }
         return PixelSize(
             width: Int((cellWidth * displayScale).rounded(.up)),
@@ -46,7 +51,7 @@ struct PhotoGridView: View {
 
     private var grid: some View {
         ScrollView {
-            LazyVGrid(columns: Self.columns, spacing: Self.spacing) {
+            LazyVGrid(columns: PhotoGridLayout.columns, spacing: PhotoGridLayout.spacing) {
                 if let cellPixelSize {
                     ForEach(model.items) { photo in
                         PhotoCellView(model: PhotoCellModel(photo: photo), pixelSize: cellPixelSize)
@@ -96,6 +101,14 @@ struct PhotoGridView: View {
             Task {
                 await model.retry()
             }
+        }
+    }
+}
+
+extension PhotoGridView where Empty == ContentUnavailableView<Label<Text, Image>, Text?, EmptyView> {
+    init(model: PhotoGridViewModel) {
+        self.init(model: model) {
+            ContentUnavailableView("No Photos", systemImage: "photo.on.rectangle")
         }
     }
 }

@@ -47,6 +47,10 @@ final class PhotoGridViewModel {
         await start(page: 1, replacing: true).value
     }
 
+    func cancel() {
+        loadTask?.cancel()
+    }
+
     @discardableResult
     private func startNextPage() -> Task<Void, Never>? {
         guard state == .idle || state == .loaded else { return nil }
