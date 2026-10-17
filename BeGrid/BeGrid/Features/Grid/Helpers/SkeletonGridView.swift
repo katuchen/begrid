@@ -4,7 +4,7 @@ struct SkeletonGridView: View {
     var body: some View {
         Color.clear
             .overlay(alignment: .top) {
-                LazyVGrid(columns: PhotoGridView.columns, spacing: PhotoGridView.spacing) {
+                LazyVGrid(columns: PhotoGridLayout.columns, spacing: PhotoGridLayout.spacing) {
                     ForEach(0..<8, id: \.self) { _ in
                         Color.photoPlaceholder
                             .aspectRatio(PhotoCellView.aspectRatio, contentMode: .fit)
