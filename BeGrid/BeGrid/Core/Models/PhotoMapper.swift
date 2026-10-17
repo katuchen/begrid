@@ -1,8 +1,6 @@
 import Foundation
 
 nonisolated enum PhotoMapper {
-    static let untitledSummary = "Untitled photo"
-
     static func photos(from dtos: [PhotoDTO]) -> [Photo] {
         dtos.map(photo(from:))
     }
@@ -23,8 +21,8 @@ nonisolated enum PhotoMapper {
         )
     }
 
-    static func summary(altDescription: String?, description: String?) -> String {
-        nonBlank(altDescription) ?? nonBlank(description) ?? untitledSummary
+    static func summary(altDescription: String?, description: String?) -> String? {
+        nonBlank(altDescription) ?? nonBlank(description)
     }
 
     private static func size(width: Int?, height: Int?) -> PixelSize? {

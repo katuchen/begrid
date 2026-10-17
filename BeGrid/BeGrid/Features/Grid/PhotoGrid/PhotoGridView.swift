@@ -51,6 +51,7 @@ struct PhotoGridView<Empty: View>: View {
     private var grid: some View {
         ScrollViewReader { proxy in
             scrollView
+                .sensoryFeedback(.impact(flexibility: .soft), trigger: detail?.id) { _, id in id != nil }
                 .fullScreenCover(item: $detail) { route in
                     PhotoDetailView(route: route, namespace: zoomNamespace) { id in
                         proxy.scrollTo(id, anchor: .center)
