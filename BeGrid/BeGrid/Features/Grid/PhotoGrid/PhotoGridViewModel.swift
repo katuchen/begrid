@@ -26,6 +26,11 @@ final class PhotoGridViewModel {
         self.source = source
     }
 
+    func loadFirstPage() async {
+        guard state == .idle else { return }
+        await loadNextPage()
+    }
+
     func loadNextPage() async {
         await startNextPage()?.value
     }

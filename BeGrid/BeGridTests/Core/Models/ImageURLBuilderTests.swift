@@ -7,6 +7,10 @@ struct ImageURLBuilderTests {
         "https://images.unsplash.com/photo-1?crop=entropy&cs=tinysrgb&dpr=3&fit=max&fm=png&ixid=M3wxMjA3fDB8MXxhbGx8MXx8&ixlib=rb-4.0.3&q=60&w=1080"
     )
 
+    @Test func pointsAreRoundedUpToPixels() {
+        #expect(PixelSize(points: CGSize(width: 100.2, height: 50), scale: 3) == PixelSize(width: 301, height: 150))
+    }
+
     @Test func keepsUnmanagedParametersVerbatim() throws {
         let base = try #require(regular)
         let url = ImageURLBuilder.url(from: base, pixelWidth: 600)

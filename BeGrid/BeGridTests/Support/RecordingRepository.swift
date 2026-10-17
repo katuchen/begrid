@@ -11,7 +11,7 @@ final class RecordingRepository: PhotoRepository {
     }
 
     private static func onePage(_ query: String) -> any PhotoSource {
-        ScriptedSource(pages: [.of("a")])
+        CountingSource(.success(.of("a", hasMore: false)))
     }
 
     var searchedQueries: [String] {
@@ -19,7 +19,7 @@ final class RecordingRepository: PhotoRepository {
     }
 
     func feedSource() -> any PhotoSource {
-        ScriptedSource(pages: [])
+        CountingSource()
     }
 
     func searchSource(query: String) -> any PhotoSource {
