@@ -36,23 +36,26 @@ struct RemoteImage: View {
     }
 
     var body: some View {
-        ZStack {
-            placeholder
-            if let blur {
-                fill(blur)
+        placeholder
+            .overlay {
+                if let blur {
+                    fill(blur)
+                }
             }
-            if let image {
-                fill(image)
-                    .transition(.opacity)
+            .overlay {
+                if let image {
+                    fill(image)
+                        .transition(.opacity)
+                }
             }
-        }
-        .task(id: blurHash) {
-            guard let blurHash, image == nil else { return }
-            blur = await BlurHash.decodedImage(from: blurHash)
-        }
-        .task(id: request) {
-            await load(request)
-        }
+            .clipped()
+            .task(id: blurHash) {
+                guard let blurHash, image == nil else { return }
+                blur = await BlurHash.decodedImage(from: blurHash)
+            }
+            .task(id: request) {
+                await load(request)
+            }
     }
 
     private func fill(_ image: UIImage) -> some View {
