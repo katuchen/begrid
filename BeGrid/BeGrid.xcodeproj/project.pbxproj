@@ -17,6 +17,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0B9521A030836E6C00C1B130 /* App.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = App.xcconfig; sourceTree = "<group>"; };
+		0B9521A130836E6C00C1B130 /* Secrets.example.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Secrets.example.xcconfig; sourceTree = "<group>"; };
+		0B9521A230836E6C00C1B130 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0B9520E930836E6B00C1B130 /* BeGrid.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeGrid.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0B9520F630836E6C00C1B130 /* BeGridTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BeGridTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -51,6 +54,7 @@
 		0B9520E030836E6A00C1B130 = {
 			isa = PBXGroup;
 			children = (
+				0B9521A330836E6C00C1B130 /* Config */,
 				0B9520EB30836E6B00C1B130 /* BeGrid */,
 				0B9520F930836E6C00C1B130 /* BeGridTests */,
 				0B9520EA30836E6B00C1B130 /* Products */,
@@ -64,6 +68,16 @@
 				0B9520F630836E6C00C1B130 /* BeGridTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		0B9521A330836E6C00C1B130 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				0B9521A030836E6C00C1B130 /* App.xcconfig */,
+				0B9521A130836E6C00C1B130 /* Secrets.example.xcconfig */,
+				0B9521A230836E6C00C1B130 /* Info.plist */,
+			);
+			path = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -305,6 +319,7 @@
 		};
 		0B95210930836E6C00C1B130 /* Debug configuration for PBXNativeTarget "BeGrid" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0B9521A030836E6C00C1B130 /* App.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -313,6 +328,7 @@
 				DEVELOPMENT_TEAM = 7GM3H24NB9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BeGrid;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -343,6 +359,7 @@
 		};
 		0B95210A30836E6C00C1B130 /* Release configuration for PBXNativeTarget "BeGrid" */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 0B9521A030836E6C00C1B130 /* App.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -351,6 +368,7 @@
 				DEVELOPMENT_TEAM = 7GM3H24NB9;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Config/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = BeGrid;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.entertainment";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

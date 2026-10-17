@@ -1,0 +1,7 @@
+// Base build settings for the BeGrid app target.
+// The Unsplash Access Key lives in the git-ignored Secrets.xcconfig.
+// Copy Secrets.example.xcconfig to Secrets.xcconfig and paste your key.
+
+UNSPLASH_ACCESS_KEY =
+
+#include? "Secrets.xcconfig"
