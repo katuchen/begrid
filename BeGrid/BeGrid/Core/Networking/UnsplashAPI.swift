@@ -20,29 +20,11 @@ nonisolated struct UnsplashAPI: Sendable {
 
     @concurrent
     private func send<T: Decodable & Sendable>(_ endpoint: UnsplashEndpoint) async throws -> T {
-        let (data, response) = try await fetch(endpoint)
-        if let error = APIError.from(response) {
-            throw error
-        }
+        let data = try await client.validatedData(for: endpoint.request(accessKey: accessKey))
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
             throw APIError.decoding
-        }
-    }
-
-    private func fetch(_ endpoint: UnsplashEndpoint) async throws -> (Data, HTTPURLResponse) {
-        do {
-            let result = try await client.data(for: endpoint.request(accessKey: accessKey))
-            try Task.checkCancellation()
-            return result
-        } catch {
-            try Task.checkCancellation()
-            switch error {
-            case let urlError as URLError: throw APIError.from(urlError)
-            case is CancellationError: throw error
-            default: throw APIError.server(statusCode: nil)
-            }
         }
     }
 }
