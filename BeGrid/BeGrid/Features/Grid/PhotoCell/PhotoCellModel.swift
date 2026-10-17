@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PhotoCellModel: Identifiable, Equatable {
+nonisolated struct PhotoCellModel: Identifiable, Equatable {
     let id: Photo.ID
     let summary: String
     let url: URL

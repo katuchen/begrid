@@ -1,6 +1,6 @@
 import SwiftUI
 
-struct PhotoCellView: View, Equatable {
+struct PhotoCellView: View, nonisolated Equatable {
     static let aspectRatio = 4.0 / 5.0
 
     let model: PhotoCellModel
@@ -20,7 +20,6 @@ struct PhotoCellView: View, Equatable {
             .overlay(alignment: .bottom) {
                 caption
             }
-            .clipped()
             .contentShape(Rectangle())
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(model.summary)
