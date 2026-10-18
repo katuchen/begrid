@@ -101,6 +101,11 @@ final class PhotoGridViewModel {
         do {
             let page = try await source.page(number)
             guard !Task.isCancelled else { return }
+            if let reason = page.staleReason, replacing, !items.isEmpty {
+                markStale(reason)
+                state = .failed(reason)
+                return
+            }
 
             if replacing {
                 seenIDs.removeAll()
@@ -111,11 +116,11 @@ final class PhotoGridViewModel {
             } else {
                 items.append(contentsOf: fresh)
             }
-            if replacing {
+            if number == 1 {
                 needsRefresh = false
-            }
-            if let reason = page.staleReason {
-                markStale(reason)
+                if let reason = page.staleReason {
+                    markStale(reason)
+                }
             }
             nextPage = number + 1
             state = page.hasMore ? .loaded : .exhausted

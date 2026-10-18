@@ -63,6 +63,47 @@ struct FallbackSourceTests {
         await #expect(throws: APIError.offline) { try await source.page(2) }
     }
 
+    @Test func unpinnedSourceIsNotSaved() async throws {
+        let store = PageStore(directory: directory, requiresPin: true)
+        _ = try await makeSource([1: [.success(.of("a"))]], id: "cat", store: store).page(1)
+
+        await #expect(throws: APIError.offline) {
+            try await makeSource([1: [.failure(APIError.offline)]], id: "cat", store: store).page(1)
+        }
+    }
+
+    @Test func pinningSavesPagesAlreadyLoaded() async throws {
+        let store = PageStore(directory: directory, requiresPin: true)
+        _ = try await makeSource([1: [.success(.of("a"))]], id: "cat", store: store).page(1)
+
+        await store.pin("cat")
+        let page = try await makeSource([1: [.failure(APIError.offline)]], id: "cat", store: PageStore(directory: directory)).page(1)
+
+        #expect(page.photos.map(\.id) == ["a"])
+    }
+
+    @Test func pinningKeepsOnlyTheLatestUnpinnedSource() async throws {
+        let store = PageStore(directory: directory, requiresPin: true)
+        _ = try await makeSource([1: [.success(.of("c"))]], id: "ca", store: store).page(1)
+        _ = try await makeSource([1: [.success(.of("cat"))]], id: "cat", store: store).page(1)
+
+        await store.pin("ca")
+
+        await #expect(throws: APIError.offline) {
+            try await makeSource([1: [.failure(APIError.offline)]], id: "ca", store: store).page(1)
+        }
+    }
+
+    @Test func pinnedSourceIsSavedAsItLoads() async throws {
+        let store = PageStore(directory: directory, requiresPin: true)
+        await store.pin("cat")
+        let source = makeSource([1: [.success(.of("a")), .failure(APIError.offline)]], id: "cat", store: store)
+
+        _ = try await source.page(1)
+
+        #expect(try await source.page(1).isStale)
+    }
+
     @Test func oldestSourceIsEvictedPastLimit() async throws {
         let date = SteppingDate()
         let store = PageStore(directory: directory, sourceLimit: 2) { date.next() }

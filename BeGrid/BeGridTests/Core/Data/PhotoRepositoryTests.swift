@@ -29,6 +29,23 @@ struct PhotoRepositoryTests {
         ])
     }
 
+    @Test(arguments: [false, true])
+    func searchIsSavedForOfflineOnlyWhenKept(kept: Bool) async throws {
+        let directory = TemporaryDirectory.make()
+        let (api, _) = UnsplashAPI.stubbed(.success(try Fixture.data(named: "search")))
+        let repository = UnsplashPhotoRepository(api: api, storeDirectory: directory)
+        _ = try await repository.searchSource(query: "Cat").page(1)
+        if kept {
+            await repository.keepOffline(query: " cat ")
+        }
+
+        let (offlineAPI, _) = UnsplashAPI.stubbed(.failure(URLError(.notConnectedToInternet)))
+        let offline = UnsplashPhotoRepository(api: offlineAPI, storeDirectory: directory)
+        let page = try? await offline.searchSource(query: "cat").page(1)
+
+        #expect(page?.isStale == (kept ? true : nil))
+    }
+
     @Test func feedIsNotCached() async throws {
         let (repository, client) = makeRepository(.success(try Fixture.data(named: "photos")))
 

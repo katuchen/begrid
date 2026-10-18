@@ -4,6 +4,7 @@ import os
 
 final class RecordingRepository: PhotoRepository {
     private let queries = OSAllocatedUnfairLock(initialState: [String]())
+    private let offlineQueries = OSAllocatedUnfairLock(initialState: [String]())
     private let makeSource: @Sendable (String) -> any PhotoSource
 
     init(makeSource: @escaping @Sendable (String) -> any PhotoSource = RecordingRepository.onePage) {
@@ -18,6 +19,10 @@ final class RecordingRepository: PhotoRepository {
         queries.withLock { $0 }
     }
 
+    var keptOfflineQueries: [String] {
+        offlineQueries.withLock { $0 }
+    }
+
     func feedSource() -> any PhotoSource {
         CountingSource()
     }
@@ -25,5 +30,9 @@ final class RecordingRepository: PhotoRepository {
     func searchSource(query: String) -> any PhotoSource {
         queries.withLock { $0.append(query) }
         return makeSource(query)
+    }
+
+    func keepOffline(query: String) async {
+        offlineQueries.withLock { $0.append(query) }
     }
 }

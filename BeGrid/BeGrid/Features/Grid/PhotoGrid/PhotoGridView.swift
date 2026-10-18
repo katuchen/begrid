@@ -165,7 +165,7 @@ struct PhotoGridView<Empty: View>: View {
     private var retryButton: some View {
         Button("Try Again") {
             Task {
-                await model.retry()
+                await model.recover()
             }
         }
     }

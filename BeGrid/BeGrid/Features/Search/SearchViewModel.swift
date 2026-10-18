@@ -82,7 +82,7 @@ final class SearchViewModel {
     private func search(_ query: String) {
         if let results, results.query == query {
             if case .failed = results.grid.state {
-                Task { await results.grid.retry() }
+                Task { await results.grid.recover() }
             }
             return
         }
@@ -94,5 +94,8 @@ final class SearchViewModel {
         recents.insert(query, at: 0)
         recentQueries = Array(recents.prefix(Self.recentLimit))
         defaults.set(recentQueries, forKey: Self.recentsKey)
+        Task { [repository] in
+            await repository.keepOffline(query: query)
+        }
     }
 }
