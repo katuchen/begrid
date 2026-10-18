@@ -18,9 +18,7 @@ struct PhotoCellView: View, nonisolated Equatable {
                 )
             }
             .overlay(alignment: .bottom) {
-                if let summary = model.summary {
-                    caption(summary)
-                }
+                caption(model.accessibilityLabel)
             }
             .contentShape(Rectangle())
             .accessibilityElement(children: .ignore)
@@ -28,8 +26,8 @@ struct PhotoCellView: View, nonisolated Equatable {
             .accessibilityAddTraits(.isImage)
     }
 
-    private func caption(_ summary: String) -> some View {
-        Text(summary)
+    private func caption(_ text: String) -> some View {
+        Text(text)
             .font(.caption)
             .dynamicTypeSize(...DynamicTypeSize.xxxLarge)
             .foregroundStyle(.white)

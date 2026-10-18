@@ -31,7 +31,7 @@ struct ImagePipelineTests {
     }
 
     @Test func requestsWithoutDeduplicationDownloadSeparately() async throws {
-        let (pipeline, client) = try makePipeline(options: PipelineOptions(deduplication: false, memoryCache: false))
+        let (pipeline, client) = try makePipeline(options: PipelineOptions(deduplication: false, memoryCache: false, diskCache: false))
         let tasks = (0..<5).map { _ in Task { try await pipeline.image(for: url, targetPixelSize: size) } }
         for task in tasks {
             _ = try await task.value
