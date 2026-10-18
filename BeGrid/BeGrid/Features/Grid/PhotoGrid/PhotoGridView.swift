@@ -19,7 +19,11 @@ struct PhotoGridView<Empty: View>: View {
     var body: some View {
         content
             .task(id: ObjectIdentifier(model)) {
+                prefetcher.cancelAll()
                 await model.loadFirstPage()
+            }
+            .onDisappear {
+                prefetcher.cancelAll()
             }
     }
 

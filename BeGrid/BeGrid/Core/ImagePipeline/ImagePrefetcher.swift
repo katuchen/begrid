@@ -16,11 +16,10 @@ final class ImagePrefetcher {
     private var prefetches: [Request: Prefetch] = [:]
 
     func prefetch(_ requests: [Request], after index: Int, using loader: any ImageLoading) {
-        let window = (index + 1)..<(index + 1 + requests.count)
-        for (request, prefetch) in prefetches where !window.contains(prefetch.index) {
-            if prefetch.index >= window.upperBound {
-                prefetch.task.cancel()
-            }
+        let wanted = Set(requests)
+        let passed = (index - Self.distance)...index
+        for (request, prefetch) in prefetches where !wanted.contains(request) && !passed.contains(prefetch.index) {
+            prefetch.task.cancel()
             prefetches[request] = nil
         }
         for (offset, request) in requests.enumerated() where prefetches[request] == nil {
@@ -28,7 +27,12 @@ final class ImagePrefetcher {
             let task = Task(priority: .utility) {
                 await loader.prefetchImage(for: request.url, targetPixelSize: request.size)
             }
-            prefetches[request] = Prefetch(index: window.lowerBound + offset, task: task)
+            prefetches[request] = Prefetch(index: index + 1 + offset, task: task)
         }
+    }
+
+    func cancelAll() {
+        prefetches.values.forEach { $0.task.cancel() }
+        prefetches = [:]
     }
 }

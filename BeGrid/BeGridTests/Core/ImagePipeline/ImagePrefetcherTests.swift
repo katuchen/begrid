@@ -35,4 +35,34 @@ struct ImagePrefetcherTests {
         #expect(Set(loader.started) == urls(1...6))
         #expect(loader.cancelled.isEmpty)
     }
+
+    @Test func scrollingFarForwardCancelsRequestsLeftBehind() async throws {
+        prefetcher.prefetch(requests(1...4), after: 0, using: loader)
+        try await waitUntil { loader.started.count == 4 }
+
+        prefetcher.prefetch(requests(21...24), after: 20, using: loader)
+        try await waitUntil { loader.cancelled.count == 4 }
+
+        #expect(loader.cancelled == urls(1...4))
+    }
+
+    @Test func replacedItemsAtTheSameIndicesAreCancelled() async throws {
+        prefetcher.prefetch(requests(1...4), after: 0, using: loader)
+        try await waitUntil { loader.started.count == 4 }
+
+        prefetcher.prefetch(requests(101...104), after: 0, using: loader)
+        try await waitUntil { loader.cancelled.count == 4 }
+
+        #expect(loader.cancelled == urls(1...4))
+    }
+
+    @Test func cancelAllCancelsEveryRequest() async throws {
+        prefetcher.prefetch(requests(1...4), after: 0, using: loader)
+        try await waitUntil { loader.started.count == 4 }
+
+        prefetcher.cancelAll()
+        try await waitUntil { loader.cancelled.count == 4 }
+
+        #expect(loader.cancelled == urls(1...4))
+    }
 }

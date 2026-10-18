@@ -136,6 +136,25 @@ struct ImagePipelineTests {
         #expect(pipeline.cachedImage(for: url, targetPixelSize: size) != nil)
     }
 
+    @Test func joiningAPrefetchRaisesItsPriority() async throws {
+        guard #available(iOS 26, *) else { return }
+        let (pipeline, client) = try makePipeline(isOpen: false)
+        let prefetch = Task(priority: .utility) {
+            await pipeline.prefetchImage(for: url, targetPixelSize: size)
+        }
+        try await waitUntil { await pipeline.waiterCount(for: url, targetPixelSize: size) == 1 }
+
+        let load = Task(priority: .userInitiated) {
+            try await pipeline.image(for: url, targetPixelSize: size)
+        }
+        try await waitUntil { await pipeline.waiterCount(for: url, targetPixelSize: size) == 2 }
+        await client.open()
+        _ = try await load.value
+        await prefetch.value
+
+        #expect(await client.priority == .userInitiated)
+    }
+
     @Test func disabledPrefetchDoesNothing() async throws {
         let (pipeline, client) = try makePipeline(options: PipelineOptions(prefetch: false))
         await pipeline.prefetchImage(for: url, targetPixelSize: size)

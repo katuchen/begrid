@@ -13,6 +13,7 @@ actor ImagePipeline: ImageLoading {
     private struct InFlight {
         let id: UUID
         let task: Task<Void, Never>
+        var priority: TaskPriority
         var waiters: [UUID: CheckedContinuation<UIImage, any Error>] = [:]
     }
 
@@ -63,6 +64,8 @@ actor ImagePipeline: ImageLoading {
         try Task.checkCancellation()
         if inFlight[key] == nil {
             start(key)
+        } else {
+            escalate(key)
         }
         let waiterID = UUID()
         return try await withTaskCancellationHandler {
@@ -80,7 +83,14 @@ actor ImagePipeline: ImageLoading {
             let result = await Result { try await fetch(key) }
             finish(id, key: key, with: result)
         }
-        inFlight[key] = InFlight(id: id, task: task)
+        inFlight[key] = InFlight(id: id, task: task, priority: Task.currentPriority)
+    }
+
+    private func escalate(_ key: Key) {
+        let priority = Task.currentPriority
+        guard #available(iOS 26, *), let flight = inFlight[key], priority > flight.priority else { return }
+        flight.task.escalatePriority(to: priority)
+        inFlight[key]?.priority = priority
     }
 
     private func leave(_ waiterID: UUID, key: Key) {
