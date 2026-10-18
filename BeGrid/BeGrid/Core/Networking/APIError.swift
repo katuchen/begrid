@@ -9,6 +9,11 @@ nonisolated enum APIError: Error, Equatable, Sendable {
 
     static let rateLimitRemainingHeader = "X-Ratelimit-Remaining"
 
+    var isTransient: Bool {
+        guard case .server(let statusCode) = self else { return false }
+        return statusCode.map { $0 >= 500 } ?? true
+    }
+
     static func from(_ response: HTTPURLResponse) -> APIError? {
         switch response.statusCode {
         case 200..<300: nil

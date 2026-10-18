@@ -18,15 +18,23 @@ actor StubHTTPClient: HTTPClient {
         }
     }
 
-    private let response: Response
+    private var responses: [Response]
     private(set) var requests: [URLRequest] = []
 
-    init(_ response: Response) {
-        self.response = response
+    init(_ responses: Response...) {
+        self.init(responses: responses)
+    }
+
+    init(responses: [Response]) {
+        self.responses = responses
     }
 
     func data(for request: URLRequest) async throws -> (Data, HTTPURLResponse) {
         requests.append(request)
+        let response = try #require(responses.first)
+        if responses.count > 1 {
+            responses.removeFirst()
+        }
         return try response.result(for: request)
     }
 

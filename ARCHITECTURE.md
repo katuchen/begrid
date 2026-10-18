@@ -66,6 +66,8 @@ Views ask for an image at a size. How it is produced is hidden from them.
 
 The repository saves the first pages of the feed and of recent searches to disk. When a request fails, it returns the saved page, marked stale, instead of an error. Stale pages never enter the in-memory search cache, so the next attempt goes to the network. When connectivity returns, grids showing saved or failed content reload on their own. Images need nothing extra, because the pipeline reads its disk cache before the network.
 
+Transient server errors are retried with backoff before falling back. Rate limits are never retried, because Unsplash's quota is hourly. If a refresh fails, or saved pages replace fresh ones while the device is online, the grid shows an alert with a retry. Offline is shown by the banner instead.
+
 ### Views receive values, not view models
 
 Grid cells take plain `Equatable` data. Changes to list-level state, such as pagination, therefore don't re-render visible cells.

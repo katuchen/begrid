@@ -18,7 +18,8 @@ nonisolated struct FallbackSource: PhotoSource {
             return page
         } catch {
             guard !(error is CancellationError), !Task.isCancelled,
-                  let saved = await store.page(number, of: id) else { throw error }
+                  var saved = await store.page(number, of: id) else { throw error }
+            saved.staleReason = error as? APIError ?? .server(statusCode: nil)
             return saved
         }
     }

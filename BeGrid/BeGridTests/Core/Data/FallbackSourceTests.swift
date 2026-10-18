@@ -20,7 +20,7 @@ struct FallbackSourceTests {
         let fallback = try await source.page(1)
 
         #expect(!fresh.isStale)
-        #expect(fallback == Page(photos: fresh.photos, hasMore: true, isStale: true))
+        #expect(fallback == Page(photos: fresh.photos, hasMore: true, staleReason: .offline))
     }
 
     @Test func failureWithoutASavedPageRethrows() async throws {

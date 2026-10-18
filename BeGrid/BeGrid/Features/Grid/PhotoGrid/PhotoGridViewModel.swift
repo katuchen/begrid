@@ -16,7 +16,8 @@ final class PhotoGridViewModel {
 
     private(set) var items: [Photo] = []
     private(set) var state: State = .idle
-    private(set) var showsSavedPhotos = false
+    private(set) var needsRefresh = false
+    private(set) var alert: APIError?
 
     @ObservationIgnored private let source: any PhotoSource
     @ObservationIgnored private var seenIDs: Set<Photo.ID> = []
@@ -47,8 +48,9 @@ final class PhotoGridViewModel {
         await loadNextPage()
     }
 
-    func reconnect() async {
-        if showsSavedPhotos {
+    func recover() async {
+        alert = nil
+        if needsRefresh {
             await refresh()
         } else {
             await retry()
@@ -59,6 +61,10 @@ final class PhotoGridViewModel {
         loadTask?.cancel()
         state = .loadingFirst
         await start(page: 1, replacing: true).value
+    }
+
+    func dismissAlert() {
+        alert = nil
     }
 
     func cancel() {
@@ -92,12 +98,20 @@ final class PhotoGridViewModel {
             } else {
                 items.append(contentsOf: fresh)
             }
-            showsSavedPhotos = (showsSavedPhotos && !replacing) || page.isStale
+            needsRefresh = (needsRefresh && !replacing) || page.isStale
+            if let reason = page.staleReason {
+                alert = reason
+            }
             nextPage = number + 1
             state = page.hasMore ? .loaded : .exhausted
         } catch {
             guard !Task.isCancelled else { return }
-            state = .failed(error as? APIError ?? .server(statusCode: nil))
+            let error = error as? APIError ?? .server(statusCode: nil)
+            if replacing && !items.isEmpty {
+                needsRefresh = true
+                alert = error
+            }
+            state = .failed(error)
         }
     }
 }

@@ -7,6 +7,7 @@ struct PhotoGridView<Empty: View>: View {
     @Environment(\.displayScale) private var displayScale
     @Environment(\.imageLoader) private var imageLoader
     @Environment(\.isOnline) private var isOnline
+    @Environment(\.isEnabled) private var isEnabled
     @State private var width: CGFloat = 0
     @State private var detail: PhotoDetailRoute?
     @State private var prefetcher = ImagePrefetcher()
@@ -27,12 +28,33 @@ struct PhotoGridView<Empty: View>: View {
                 prefetcher.cancelAll()
             }
             .onChange(of: isOnline) { _, isOnline in
+                model.dismissAlert()
                 guard isOnline else { return }
                 prefetcher.cancelAll()
                 Task {
-                    await model.reconnect()
+                    await model.recover()
                 }
             }
+            .alert("Couldn't Load New Photos", isPresented: isAlertPresented, presenting: model.alert) { _ in
+                Button("Try Again") {
+                    Task {
+                        await model.recover()
+                    }
+                }
+                Button("OK", role: .cancel) {}
+            } message: { error in
+                Text(error.message)
+            }
+    }
+
+    private var isAlertPresented: Binding<Bool> {
+        Binding {
+            model.alert != nil && isOnline && isEnabled && detail == nil
+        } set: { isPresented in
+            if !isPresented {
+                model.dismissAlert()
+            }
+        }
     }
 
     @ViewBuilder

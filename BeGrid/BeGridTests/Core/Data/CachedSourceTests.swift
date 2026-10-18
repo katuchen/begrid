@@ -44,7 +44,7 @@ struct CachedSourceTests {
     }
 
     @Test func stalePageIsNotCached() async throws {
-        let upstream = CountingSource(.success(Page(photos: [], hasMore: true, isStale: true)))
+        let upstream = CountingSource(.success(Page(photos: [], hasMore: true, staleReason: .offline)))
         let cache = PageCache()
 
         _ = try await cached("cat", upstream, cache: cache).page(1)

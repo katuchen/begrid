@@ -16,7 +16,7 @@ struct RootView: View {
             ZStack {
                 FeedView(model: feed)
                     .opacity(showsResults ? 0 : 1)
-                    .allowsHitTesting(!showsResults)
+                    .disabled(showsResults)
                     .accessibilityHidden(showsResults)
                 if let results = search.results {
                     SearchResultsView(results: results, isStale: search.isStale)

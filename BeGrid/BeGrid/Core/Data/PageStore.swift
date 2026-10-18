@@ -22,7 +22,7 @@ actor PageStore {
     func page(_ number: Int, of source: String) -> Page? {
         guard let data = try? Data(contentsOf: fileURL(for: number, of: source)),
               let snapshot = try? JSONDecoder().decode(Snapshot.self, from: data) else { return nil }
-        return Page(photos: snapshot.photos, hasMore: snapshot.hasMore, isStale: true)
+        return Page(photos: snapshot.photos, hasMore: snapshot.hasMore)
     }
 
     func save(_ page: Page, number: Int, of source: String) {
