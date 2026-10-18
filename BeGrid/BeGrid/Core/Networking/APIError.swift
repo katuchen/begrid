@@ -26,6 +26,10 @@ nonisolated enum APIError: Error, Equatable, Sendable {
         }
     }
 
+    static func from(_ error: any Error) -> APIError {
+        error as? APIError ?? .server(statusCode: nil)
+    }
+
     static func from(_ error: URLError) -> APIError {
         switch error.code {
         case .notConnectedToInternet, .networkConnectionLost, .dataNotAllowed, .internationalRoamingOff,

@@ -2,19 +2,20 @@ import SwiftUI
 
 struct PhotoGridView<Empty: View>: View {
     let model: PhotoGridViewModel
+    let isActive: Bool
     private let empty: Empty
 
     @Environment(\.displayScale) private var displayScale
     @Environment(\.imageLoader) private var imageLoader
     @Environment(\.isOnline) private var isOnline
-    @Environment(\.isEnabled) private var isEnabled
     @State private var width: CGFloat = 0
     @State private var detail: PhotoDetailRoute?
     @State private var prefetcher = ImagePrefetcher()
     @Namespace private var zoomNamespace
 
-    init(model: PhotoGridViewModel, @ViewBuilder empty: () -> Empty) {
+    init(model: PhotoGridViewModel, isActive: Bool = true, @ViewBuilder empty: () -> Empty) {
         self.model = model
+        self.isActive = isActive
         self.empty = empty()
     }
 
@@ -27,12 +28,9 @@ struct PhotoGridView<Empty: View>: View {
             .onDisappear {
                 prefetcher.cancelAll()
             }
-            .onChange(of: isOnline) { _, isOnline in
-                model.dismissAlert()
-                guard isOnline else { return }
-                prefetcher.cancelAll()
+            .onChange(of: isOnline, initial: true) { _, isOnline in
                 Task {
-                    await model.recover()
+                    await model.connectivityChanged(isOnline: isOnline)
                 }
             }
             .alert("Couldn't Load New Photos", isPresented: isAlertPresented, presenting: model.alert) { _ in
@@ -49,7 +47,7 @@ struct PhotoGridView<Empty: View>: View {
 
     private var isAlertPresented: Binding<Bool> {
         Binding {
-            model.alert != nil && isOnline && isEnabled && detail == nil
+            model.alert != nil && isActive && detail == nil
         } set: { isPresented in
             if !isPresented {
                 model.dismissAlert()
@@ -174,8 +172,8 @@ struct PhotoGridView<Empty: View>: View {
 }
 
 extension PhotoGridView where Empty == ContentUnavailableView<Label<Text, Image>, Text?, EmptyView> {
-    init(model: PhotoGridViewModel) {
-        self.init(model: model) {
+    init(model: PhotoGridViewModel, isActive: Bool = true) {
+        self.init(model: model, isActive: isActive) {
             ContentUnavailableView("No Photos", systemImage: "photo.on.rectangle")
         }
     }

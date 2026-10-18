@@ -61,9 +61,7 @@ struct UnsplashAPIRetryTests {
     private let serverError = StubHTTPClient.Response.success(Data(), status: 503)
 
     private func retrying(_ responses: StubHTTPClient.Response...) -> (UnsplashAPI, StubHTTPClient) {
-        let client = StubHTTPClient(responses: responses)
-        let policy = RetryPolicy(maxAttempts: 3, baseDelay: .seconds(1), clock: clock)
-        return (UnsplashAPI(client: client, accessKey: UnsplashAPI.testAccessKey, retryPolicy: policy), client)
+        UnsplashAPI.stubbed(responses: responses, retryPolicy: RetryPolicy(maxAttempts: 3, baseDelay: .seconds(1), clock: clock))
     }
 
     @Test func serverErrorIsRetriedWithBackoff() async throws {

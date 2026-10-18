@@ -14,9 +14,9 @@ struct RootView: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                FeedView(model: feed)
+                FeedView(model: feed, isActive: !showsResults)
                     .opacity(showsResults ? 0 : 1)
-                    .disabled(showsResults)
+                    .allowsHitTesting(!showsResults)
                     .accessibilityHidden(showsResults)
                 if let results = search.results {
                     SearchResultsView(results: results, isStale: search.isStale)

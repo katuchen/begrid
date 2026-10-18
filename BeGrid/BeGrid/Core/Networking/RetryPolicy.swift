@@ -1,8 +1,6 @@
 import Foundation
 
 nonisolated struct RetryPolicy: Sendable {
-    static let none = RetryPolicy(maxAttempts: 1)
-
     var maxAttempts = 3
     var baseDelay: Duration = .milliseconds(500)
     var clock: any Clock<Duration> = ContinuousClock()

@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 
 actor PageStore {
@@ -11,6 +10,8 @@ actor PageStore {
     private let pageLimit: Int
     private let sourceLimit: Int
     private let now: @Sendable () -> Date
+    private let encoder = JSONEncoder()
+    private let decoder = JSONDecoder()
 
     init(directory: URL, pageLimit: Int = 3, sourceLimit: Int = 5, now: @escaping @Sendable () -> Date = { .now }) {
         self.directory = directory
@@ -20,23 +21,26 @@ actor PageStore {
     }
 
     func page(_ number: Int, of source: String) -> Page? {
-        guard let data = try? Data(contentsOf: fileURL(for: number, of: source)),
-              let snapshot = try? JSONDecoder().decode(Snapshot.self, from: data) else { return nil }
+        guard let data = try? Data(contentsOf: fileURL(for: number, in: folderURL(for: source))),
+              let snapshot = try? decoder.decode(Snapshot.self, from: data) else { return nil }
         return Page(photos: snapshot.photos, hasMore: snapshot.hasMore)
     }
 
     func save(_ page: Page, number: Int, of source: String) {
         guard number <= pageLimit,
-              let data = try? JSONEncoder().encode(Snapshot(photos: page.photos, hasMore: page.hasMore)) else { return }
+              let data = try? encoder.encode(Snapshot(photos: page.photos, hasMore: page.hasMore)) else { return }
         let folder = folderURL(for: source)
+        let isNewSource = !FileManager.default.fileExists(atPath: folder.path(percentEncoded: false))
         do {
             try FileManager.default.createDirectory(at: folder, withIntermediateDirectories: true)
-            try data.write(to: fileURL(for: number, of: source), options: .atomic)
+            try data.write(to: fileURL(for: number, in: folder), options: .atomic)
             try FileManager.default.setAttributes([.modificationDate: now()], ofItemAtPath: folder.path(percentEncoded: false))
         } catch {
             return
         }
-        evictOldSources()
+        if isNewSource {
+            evictOldSources()
+        }
     }
 
     private func evictOldSources() {
@@ -49,11 +53,10 @@ actor PageStore {
     }
 
     private func folderURL(for source: String) -> URL {
-        let digest = SHA256.hash(data: Data(source.utf8))
-        return directory.appending(path: digest.map { String(format: "%02x", $0) }.joined(), directoryHint: .isDirectory)
+        directory.appending(path: source.sha256, directoryHint: .isDirectory)
     }
 
-    private func fileURL(for number: Int, of source: String) -> URL {
-        folderURL(for: source).appending(path: "\(number).json", directoryHint: .notDirectory)
+    private func fileURL(for number: Int, in folder: URL) -> URL {
+        folder.appending(path: "\(number).json", directoryHint: .notDirectory)
     }
 }

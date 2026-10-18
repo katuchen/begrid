@@ -16,9 +16,10 @@ final class PhotoGridViewModel {
 
     private(set) var items: [Photo] = []
     private(set) var state: State = .idle
-    private(set) var needsRefresh = false
-    private(set) var alert: APIError?
+    private var failure: APIError?
+    private var isOnline = true
 
+    @ObservationIgnored private(set) var needsRefresh = false
     @ObservationIgnored private let source: any PhotoSource
     @ObservationIgnored private var seenIDs: Set<Photo.ID> = []
     @ObservationIgnored private var nextPage = 1
@@ -26,6 +27,10 @@ final class PhotoGridViewModel {
 
     init(source: any PhotoSource) {
         self.source = source
+    }
+
+    var alert: APIError? {
+        isOnline ? failure : nil
     }
 
     func loadFirstPage() async {
@@ -48,8 +53,16 @@ final class PhotoGridViewModel {
         await loadNextPage()
     }
 
+    func connectivityChanged(isOnline: Bool) async {
+        self.isOnline = isOnline
+        failure = nil
+        if isOnline {
+            await recover()
+        }
+    }
+
     func recover() async {
-        alert = nil
+        failure = nil
         if needsRefresh {
             await refresh()
         } else {
@@ -64,7 +77,7 @@ final class PhotoGridViewModel {
     }
 
     func dismissAlert() {
-        alert = nil
+        failure = nil
     }
 
     func cancel() {
@@ -98,20 +111,26 @@ final class PhotoGridViewModel {
             } else {
                 items.append(contentsOf: fresh)
             }
-            needsRefresh = (needsRefresh && !replacing) || page.isStale
+            if replacing {
+                needsRefresh = false
+            }
             if let reason = page.staleReason {
-                alert = reason
+                markStale(reason)
             }
             nextPage = number + 1
             state = page.hasMore ? .loaded : .exhausted
         } catch {
             guard !Task.isCancelled else { return }
-            let error = error as? APIError ?? .server(statusCode: nil)
+            let error = APIError.from(error)
             if replacing && !items.isEmpty {
-                needsRefresh = true
-                alert = error
+                markStale(error)
             }
             state = .failed(error)
         }
+    }
+
+    private func markStale(_ error: APIError) {
+        needsRefresh = true
+        failure = error
     }
 }

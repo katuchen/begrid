@@ -43,16 +43,6 @@ struct CachedSourceTests {
         #expect(await upstream.requestedPages == [1])
     }
 
-    @Test func stalePageIsNotCached() async throws {
-        let upstream = CountingSource(.success(Page(photos: [], hasMore: true, staleReason: .offline)))
-        let cache = PageCache()
-
-        _ = try await cached("cat", upstream, cache: cache).page(1)
-        _ = try await cached("cat", upstream, cache: cache).page(1)
-
-        #expect(await upstream.requestedPages == [1, 1])
-    }
-
     @Test func expiredSourceIsFetchedAgain() async throws {
         let clock = TestClock()
         let cache = PageCache(lifetime: 60) { clock.now }

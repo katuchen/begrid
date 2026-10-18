@@ -29,7 +29,7 @@ nonisolated struct UnsplashPhotoRepository: PhotoRepository {
     func searchSource(query: String) -> any PhotoSource {
         let query = query.trimmingCharacters(in: .whitespacesAndNewlines)
         let id = query.lowercased()
-        let upstream = FallbackSource(id: id, upstream: SearchSource(query: query, api: api), store: searchStore)
-        return CachedSource(id: id, upstream: upstream, cache: searchCache)
+        let upstream = CachedSource(id: id, upstream: SearchSource(query: query, api: api), cache: searchCache)
+        return FallbackSource(id: id, upstream: upstream, store: searchStore)
     }
 }

@@ -21,10 +21,6 @@ actor StubHTTPClient: HTTPClient {
     private var responses: [Response]
     private(set) var requests: [URLRequest] = []
 
-    init(_ responses: Response...) {
-        self.init(responses: responses)
-    }
-
     init(responses: [Response]) {
         self.responses = responses
     }

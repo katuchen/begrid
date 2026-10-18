@@ -187,6 +187,21 @@ struct PhotoGridViewModelTests {
         #expect(model.state == .failed(.server(statusCode: 500)))
     }
 
+    @Test func alertIsHiddenWhileOfflineAndClearedOnReconnect() async {
+        let saved = Page(photos: [.stub(id: "old")], hasMore: true, staleReason: .offline)
+        let source = ScriptedSource([1: [.success(saved), .success(.of("new"))]])
+        let model = PhotoGridViewModel(source: source)
+        await model.connectivityChanged(isOnline: false)
+
+        await model.loadNextPage()
+        #expect(model.alert == nil)
+
+        await model.connectivityChanged(isOnline: true)
+
+        #expect(model.alert == nil)
+        #expect(ids(model) == ["new"])
+    }
+
     @Test func dismissingClearsTheAlert() async {
         let saved = Page(photos: [.stub(id: "old")], hasMore: true, staleReason: .offline)
         let model = PhotoGridViewModel(source: ScriptedSource([1: [.success(saved)]]))
