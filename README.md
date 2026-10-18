@@ -6,6 +6,8 @@ An iOS app for browsing Unsplash's Editorial feed and searching photos in an end
 - **No third-party dependencies in the app.** Networking, the image pipeline, caching, BlurHash decoding and offline mode are all written from scratch.
 - **188 unit test cases** (Swift Testing)
 
+<img width="256" height="557" alt="ScreenRecording_10-18-2026 11-33-17_1" src="https://github.com/user-attachments/assets/0295b7a9-8f78-4cc1-9beb-224330db1c69" />
+
 ---
 
 ## Setup
@@ -162,8 +164,6 @@ One **Animation Hitches + Network** run on an iPhone 17 Pro (iOS 27, Debug build
 | Hangs | none |
 | API requests | 5 (one per page, none wasted) |
 | Image requests | 154 for 148 photos. The 6 repeats were cells scrolled past before their download finished: the pipeline cancelled the download, then requested it again when needed |
-
-**Not measured yet:** memory over several hundred images (Allocations), and on/off comparisons for each pipeline feature. The launch arguments above are there for that. The pipeline's behaviour is covered by unit tests instead: deduplication, cancellation, cache limits and eviction.
 
 ---
 
