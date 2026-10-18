@@ -156,6 +156,20 @@ struct SearchViewModelTests {
         #expect(model.results?.query == "cats")
     }
 
+    @Test func onlySubmittedQueriesAreKeptOffline() async throws {
+        let model = makeModel()
+
+        model.query = "cat"
+        try await waitUntil { clock.sleeperCount == 1 }
+        clock.advance(by: SearchViewModel.debounce)
+        try await waitUntil { model.results != nil }
+        #expect(repository.keptOfflineQueries.isEmpty)
+
+        model.submit()
+
+        try await waitUntil { repository.keptOfflineQueries == ["cat"] }
+    }
+
     @Test func submittedQueriesAreRememberedMostRecentFirst() {
         let model = makeModel()
 

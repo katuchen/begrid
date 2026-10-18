@@ -35,6 +35,7 @@ ImagePipeline: a standalone subsystem used by views
 | `Core/Networking/` | HTTP transport and Unsplash endpoint definitions |
 | `Core/Data/` | Repositories: the single source of photo data |
 | `Core/ImagePipeline/` | Image loading, caching, and sizing |
+| `Core/Connectivity/` | Network reachability, exposed to views as a plain value |
 | `Features/<Name>/` | One folder per screen or shared feature (`Grid`, `Feed`, `Search`, `Detail`) |
 | `DesignSystem/` | Reusable visual components with no business logic |
 
@@ -60,6 +61,12 @@ Image loading drives most of the app's performance, so it is a dedicated compone
 - downsampling to display size
 
 Views ask for an image at a size. How it is produced is hidden from them.
+
+### Offline falls back to saved pages
+
+The repository saves the first pages of the feed and of recently submitted searches to disk. When a request fails, it returns the saved page, marked stale, instead of an error. The disk fallback sits outside the in-memory search cache, so stale pages never enter it and the next attempt goes to the network. When connectivity returns, grids showing saved or failed content reload on their own. Images are read from the pipeline's disk cache first, and image requests that miss it wait for connectivity instead of failing.
+
+Transient server errors are retried with backoff before falling back. Rate limits are never retried, because Unsplash's quota is hourly. If a refresh fails, or saved pages replace fresh ones while the device is online, the grid shows an alert with a retry. Offline is shown by the banner instead.
 
 ### Views receive values, not view models
 

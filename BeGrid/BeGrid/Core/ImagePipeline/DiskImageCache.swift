@@ -1,4 +1,3 @@
-import CryptoKit
 import Foundation
 
 actor DiskImageCache {
@@ -87,7 +86,6 @@ actor DiskImageCache {
     }
 
     private func fileURL(for url: URL) -> URL {
-        let digest = SHA256.hash(data: Data(url.absoluteString.utf8))
-        return directory.appending(path: digest.map { String(format: "%02x", $0) }.joined(), directoryHint: .notDirectory)
+        directory.appending(path: url.absoluteString.sha256, directoryHint: .notDirectory)
     }
 }

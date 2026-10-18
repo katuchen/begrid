@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct PixelSize: Hashable, Sendable {
+nonisolated struct PixelSize: Hashable, Codable, Sendable {
     let width: Int
     let height: Int
 

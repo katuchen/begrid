@@ -39,14 +39,14 @@ nonisolated struct URLSessionHTTPClient: HTTPClient {
         return (data, httpResponse)
     }
 
-    static func makeSession(cachesResponses: Bool = true) -> URLSession {
+    static func makeSession(cachesResponses: Bool = true, waitsForConnectivity: Bool = false) -> URLSession {
         let configuration = URLSessionConfiguration.default
         if !cachesResponses {
             configuration.urlCache = nil
             configuration.requestCachePolicy = .reloadIgnoringLocalCacheData
         }
         configuration.timeoutIntervalForRequest = 15
-        configuration.waitsForConnectivity = false
+        configuration.waitsForConnectivity = waitsForConnectivity
         return URLSession(configuration: configuration)
     }
 }

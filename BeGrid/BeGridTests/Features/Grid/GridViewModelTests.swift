@@ -122,6 +122,131 @@ struct PhotoGridViewModelTests {
         #expect(await source.requestedPages == [1, 2, 2])
     }
 
+    @Test func savedPhotosRaiseAnAlertAndRecoveringReplacesThem() async {
+        let saved = Page(photos: [.stub(id: "old")], hasMore: true, staleReason: .rateLimited)
+        let source = ScriptedSource([1: [.success(saved), .success(.of("new"))]])
+        let model = PhotoGridViewModel(source: source)
+
+        await model.loadNextPage()
+        #expect(model.needsRefresh)
+        #expect(model.alert == .rateLimited)
+
+        await model.recover()
+
+        #expect(!model.needsRefresh)
+        #expect(model.alert == nil)
+        #expect(ids(model) == ["new"])
+        #expect(await source.requestedPages == [1, 1])
+    }
+
+    @Test func recoveringRetriesAFailedLoad() async {
+        let source = ScriptedSource([1: [.success(.of("a"))], 2: [.failure(APIError.offline), .success(.of("b"))]])
+        let model = PhotoGridViewModel(source: source)
+        await model.loadNextPage()
+        await model.loadNextPage()
+        #expect(model.alert == nil)
+
+        await model.recover()
+
+        #expect(ids(model) == ["a", "b"])
+        #expect(await source.requestedPages == [1, 2, 2])
+    }
+
+    @Test func recoveringAFreshGridDoesNothing() async {
+        let source = ScriptedSource(pages: [.of("a"), .of("b")])
+        let model = PhotoGridViewModel(source: source)
+        await model.loadNextPage()
+
+        await model.recover()
+
+        #expect(await source.requestedPages == [1])
+    }
+
+    @Test func failedRefreshKeepsItemsRaisesAnAlertAndRecoveringRefreshesAgain() async {
+        let source = ScriptedSource([1: [.success(.of("a")), .failure(APIError.server(statusCode: 500)), .success(.of("new"))]])
+        let model = PhotoGridViewModel(source: source)
+        await model.loadNextPage()
+
+        await model.refresh()
+        #expect(model.alert == .server(statusCode: 500))
+        #expect(ids(model) == ["a"])
+
+        await model.recover()
+
+        #expect(model.alert == nil)
+        #expect(ids(model) == ["new"])
+        #expect(await source.requestedPages == [1, 1, 1])
+    }
+
+    @Test func refreshFallingBackToSavedPhotosKeepsTheLoadedItems() async {
+        let saved = Page(photos: [.stub(id: "old")], hasMore: true, staleReason: .offline)
+        let source = ScriptedSource([1: [.success(.of("a")), .success(saved), .success(.of("new"))], 2: [.success(.of("b"))]])
+        let model = PhotoGridViewModel(source: source)
+        await model.loadNextPage()
+        await model.loadNextPage()
+
+        await model.refresh()
+        #expect(ids(model) == ["a", "b"])
+        #expect(model.alert == .offline)
+        #expect(model.state == .failed(.offline))
+
+        await model.recover()
+
+        #expect(ids(model) == ["new"])
+        #expect(model.alert == nil)
+    }
+
+    @Test func savedLaterPageIsAppendedWithoutAnAlert() async {
+        let saved = Page(photos: [.stub(id: "b")], hasMore: true, staleReason: .server(statusCode: 503))
+        let source = ScriptedSource([1: [.success(.of("a"))], 2: [.success(saved)], 3: [.success(.of("c"))]])
+        let model = PhotoGridViewModel(source: source)
+        await model.loadNextPage()
+
+        await model.loadNextPage()
+        #expect(ids(model) == ["a", "b"])
+        #expect(model.alert == nil)
+        #expect(!model.needsRefresh)
+
+        await model.recover()
+
+        #expect(await source.requestedPages == [1, 2])
+    }
+
+    @Test func failedFirstLoadDoesNotRaiseAnAlert() async {
+        let model = PhotoGridViewModel(source: ScriptedSource([1: [.failure(APIError.server(statusCode: 500))]]))
+
+        await model.refresh()
+
+        #expect(model.alert == nil)
+        #expect(model.state == .failed(.server(statusCode: 500)))
+    }
+
+    @Test func alertIsHiddenWhileOfflineAndClearedOnReconnect() async {
+        let saved = Page(photos: [.stub(id: "old")], hasMore: true, staleReason: .offline)
+        let source = ScriptedSource([1: [.success(saved), .success(.of("new"))]])
+        let model = PhotoGridViewModel(source: source)
+        await model.connectivityChanged(isOnline: false)
+
+        await model.loadNextPage()
+        #expect(model.alert == nil)
+
+        await model.connectivityChanged(isOnline: true)
+
+        #expect(model.alert == nil)
+        #expect(ids(model) == ["new"])
+    }
+
+    @Test func dismissingClearsTheAlert() async {
+        let saved = Page(photos: [.stub(id: "old")], hasMore: true, staleReason: .offline)
+        let model = PhotoGridViewModel(source: ScriptedSource([1: [.success(saved)]]))
+        await model.loadNextPage()
+
+        model.dismissAlert()
+
+        #expect(model.alert == nil)
+        #expect(model.needsRefresh)
+    }
+
     @Test func unknownErrorIsReportedAsServerError() async {
         let model = PhotoGridViewModel(source: ScriptedSource([1: [.failure(Failure())]]))
 

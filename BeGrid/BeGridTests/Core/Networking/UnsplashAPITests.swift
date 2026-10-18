@@ -55,3 +55,65 @@ struct UnsplashAPITests {
         await #expect(throws: APIError.server(statusCode: nil)) { try await api.photos(page: 1) }
     }
 }
+
+struct UnsplashAPIRetryTests {
+    private let clock = ManualClock()
+    private let serverError = StubHTTPClient.Response.success(Data(), status: 503)
+
+    private func retrying(_ responses: StubHTTPClient.Response...) -> (UnsplashAPI, StubHTTPClient) {
+        UnsplashAPI.stubbed(responses: responses, retryPolicy: RetryPolicy(maxAttempts: 3, baseDelay: .seconds(1), clock: clock))
+    }
+
+    @Test func serverErrorIsRetriedWithBackoff() async throws {
+        let (api, client) = retrying(serverError, serverError, .success(Data("[]".utf8)))
+        let task = Task { try await api.photos(page: 1) }
+
+        try await waitUntil { clock.sleeperCount == 1 }
+        clock.advance(by: .seconds(1))
+        try await waitUntil { await client.requests.count == 2 && clock.sleeperCount == 1 }
+        clock.advance(by: .seconds(1))
+        #expect(await client.requests.count == 2)
+        clock.advance(by: .seconds(1))
+
+        #expect(try await task.value.isEmpty)
+        #expect(await client.requests.count == 3)
+    }
+
+    @Test func lastErrorIsThrownAfterMaxAttempts() async throws {
+        let (api, client) = retrying(serverError)
+        let task = Task { try await api.photos(page: 1) }
+
+        for _ in 0..<2 {
+            try await waitUntil { clock.sleeperCount == 1 }
+            clock.advance(by: .seconds(2))
+        }
+
+        await #expect(throws: APIError.server(statusCode: 503)) { try await task.value }
+        #expect(await client.requests.count == 3)
+    }
+
+    @Test(arguments: [
+        StubHTTPClient.Response.success(Data(), status: 429),
+        .success(Data(), status: 401),
+        .success(Data(), status: 404),
+        .success(Data("not json".utf8)),
+        .failure(URLError(.notConnectedToInternet))
+    ])
+    func nonTransientErrorIsNotRetried(_ response: StubHTTPClient.Response) async {
+        let (api, client) = retrying(response)
+
+        await #expect(throws: APIError.self) { try await api.photos(page: 1) }
+        #expect(await client.requests.count == 1)
+    }
+
+    @Test func cancellingDuringBackoffStopsRetrying() async throws {
+        let (api, client) = retrying(serverError)
+        let task = Task { try await api.photos(page: 1) }
+        try await waitUntil { clock.sleeperCount == 1 }
+
+        task.cancel()
+
+        await #expect(throws: CancellationError.self) { try await task.value }
+        #expect(await client.requests.count == 1)
+    }
+}

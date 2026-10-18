@@ -23,7 +23,9 @@ actor ImagePipeline: ImageLoading {
     private var inFlight: [Key: InFlight] = [:]
 
     init(
-        client: any HTTPClient = URLSessionHTTPClient(session: URLSessionHTTPClient.makeSession(cachesResponses: false)),
+        client: any HTTPClient = URLSessionHTTPClient(
+            session: URLSessionHTTPClient.makeSession(cachesResponses: false, waitsForConnectivity: true)
+        ),
         options: PipelineOptions = PipelineOptions(),
         memoryCache: MemoryImageCache = MemoryImageCache(),
         diskCache: DiskImageCache = DiskImageCache()

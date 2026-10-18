@@ -4,6 +4,8 @@ nonisolated struct PipelineOptions: Equatable, Sendable {
     var deduplication = true
     var downsampling = true
     var memoryCache = true
+    var diskCache = true
+    var prefetch = true
 
     #if DEBUG
     static func overridden(by defaults: UserDefaults = .standard) -> PipelineOptions {
@@ -14,7 +16,9 @@ nonisolated struct PipelineOptions: Equatable, Sendable {
         return PipelineOptions(
             deduplication: flag("dedup"),
             downsampling: flag("downsample"),
-            memoryCache: flag("memoryCache")
+            memoryCache: flag("memoryCache"),
+            diskCache: flag("diskCache"),
+            prefetch: flag("prefetch")
         )
     }
     #endif
