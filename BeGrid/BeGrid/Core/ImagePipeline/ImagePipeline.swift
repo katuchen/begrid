@@ -13,6 +13,7 @@ actor ImagePipeline: ImageLoading {
     private struct InFlight {
         let id: UUID
         let task: Task<Void, Never>
+        var priority: TaskPriority
         var waiters: [UUID: CheckedContinuation<UIImage, any Error>] = [:]
     }
 
@@ -24,9 +25,10 @@ actor ImagePipeline: ImageLoading {
     init(
         client: any HTTPClient = URLSessionHTTPClient(session: URLSessionHTTPClient.makeSession(cachesResponses: false)),
         options: PipelineOptions = PipelineOptions(),
-        memoryCache: MemoryImageCache = MemoryImageCache()
+        memoryCache: MemoryImageCache = MemoryImageCache(),
+        diskCache: DiskImageCache = DiskImageCache()
     ) {
-        fetcher = ImageFetcher(client: client)
+        fetcher = ImageFetcher(client: client, diskCache: options.diskCache ? diskCache : nil)
         self.options = options
         self.memoryCache = memoryCache
     }
@@ -49,6 +51,11 @@ actor ImagePipeline: ImageLoading {
         return memoryCache.image(for: Key(url: url, size: targetPixelSize).cacheKey)
     }
 
+    func prefetchImage(for url: URL, targetPixelSize: PixelSize) async {
+        guard options.prefetch else { return }
+        _ = try? await image(for: url, targetPixelSize: targetPixelSize)
+    }
+
     func waiterCount(for url: URL, targetPixelSize: PixelSize) -> Int {
         inFlight[Key(url: url, size: targetPixelSize)]?.waiters.count ?? 0
     }
@@ -57,6 +64,8 @@ actor ImagePipeline: ImageLoading {
         try Task.checkCancellation()
         if inFlight[key] == nil {
             start(key)
+        } else {
+            escalate(key)
         }
         let waiterID = UUID()
         return try await withTaskCancellationHandler {
@@ -74,7 +83,14 @@ actor ImagePipeline: ImageLoading {
             let result = await Result { try await fetch(key) }
             finish(id, key: key, with: result)
         }
-        inFlight[key] = InFlight(id: id, task: task)
+        inFlight[key] = InFlight(id: id, task: task, priority: Task.currentPriority)
+    }
+
+    private func escalate(_ key: Key) {
+        let priority = Task.currentPriority
+        guard #available(iOS 26, *), let flight = inFlight[key], priority > flight.priority else { return }
+        flight.task.escalatePriority(to: priority)
+        inFlight[key]?.priority = priority
     }
 
     private func leave(_ waiterID: UUID, key: Key) {

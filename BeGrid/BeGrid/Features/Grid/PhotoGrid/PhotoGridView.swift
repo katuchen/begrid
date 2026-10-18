@@ -5,8 +5,10 @@ struct PhotoGridView<Empty: View>: View {
     private let empty: Empty
 
     @Environment(\.displayScale) private var displayScale
+    @Environment(\.imageLoader) private var imageLoader
     @State private var width: CGFloat = 0
     @State private var detail: PhotoDetailRoute?
+    @State private var prefetcher = ImagePrefetcher()
     @Namespace private var zoomNamespace
 
     init(model: PhotoGridViewModel, @ViewBuilder empty: () -> Empty) {
@@ -17,7 +19,11 @@ struct PhotoGridView<Empty: View>: View {
     var body: some View {
         content
             .task(id: ObjectIdentifier(model)) {
+                prefetcher.cancelAll()
                 await model.loadFirstPage()
+            }
+            .onDisappear {
+                prefetcher.cancelAll()
             }
     }
 
@@ -64,7 +70,7 @@ struct PhotoGridView<Empty: View>: View {
         ScrollView {
             LazyVGrid(columns: PhotoGridLayout.columns, spacing: PhotoGridLayout.spacing) {
                 if let cellPixelSize {
-                    ForEach(model.items) { photo in
+                    ForEach(Array(model.items.enumerated()), id: \.element.id) { index, photo in
                         Button {
                             open(photo, previewPixelSize: cellPixelSize)
                         } label: {
@@ -75,6 +81,7 @@ struct PhotoGridView<Empty: View>: View {
                         .zoomTransitionSource(id: photo.id, in: zoomNamespace)
                         .onAppear {
                             model.onItemAppear(photo.id)
+                            prefetch(after: index, pixelSize: cellPixelSize)
                         }
                     }
                 }
@@ -85,6 +92,14 @@ struct PhotoGridView<Empty: View>: View {
         .refreshable {
             await model.refresh()
         }
+    }
+
+    private func prefetch(after index: Int, pixelSize: PixelSize) {
+        let upcoming = model.items.dropFirst(index + 1).prefix(ImagePrefetcher.distance)
+        let requests = upcoming.map {
+            ImagePrefetcher.Request(url: PhotoCellModel(photo: $0).imageURL(covering: pixelSize), size: pixelSize)
+        }
+        prefetcher.prefetch(requests, after: index, using: imageLoader)
     }
 
     private func open(_ photo: Photo, previewPixelSize: PixelSize) {

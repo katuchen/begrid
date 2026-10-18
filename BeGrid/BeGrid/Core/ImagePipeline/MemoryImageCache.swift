@@ -3,23 +3,21 @@ import UIKit
 nonisolated final class MemoryImageCache: @unchecked Sendable {
     private let cache = NSCache<NSString, UIImage>()
     private let notificationCenter: NotificationCenter
-    private let observer: any NSObjectProtocol
+    private let observers: [any NSObjectProtocol]
 
     init(costLimit: Int = MemoryImageCache.defaultCostLimit, notificationCenter: NotificationCenter = .default) {
         cache.totalCostLimit = costLimit
         self.notificationCenter = notificationCenter
         nonisolated(unsafe) let cache = cache
-        observer = notificationCenter.addObserver(
-            forName: UIApplication.didReceiveMemoryWarningNotification,
-            object: nil,
-            queue: nil
-        ) { _ in
-            cache.removeAllObjects()
+        observers = [UIApplication.didReceiveMemoryWarningNotification, UIApplication.didEnterBackgroundNotification].map {
+            notificationCenter.addObserver(forName: $0, object: nil, queue: nil) { _ in
+                cache.removeAllObjects()
+            }
         }
     }
 
     deinit {
-        notificationCenter.removeObserver(observer)
+        observers.forEach(notificationCenter.removeObserver)
     }
 
     func image(for key: String) -> UIImage? {

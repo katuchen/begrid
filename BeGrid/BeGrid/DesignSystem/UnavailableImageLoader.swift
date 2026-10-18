@@ -10,4 +10,6 @@ nonisolated struct UnavailableImageLoader: ImageLoading {
     func cachedImage(for url: URL, targetPixelSize: PixelSize) -> UIImage? {
         nil
     }
+
+    func prefetchImage(for url: URL, targetPixelSize: PixelSize) async {}
 }

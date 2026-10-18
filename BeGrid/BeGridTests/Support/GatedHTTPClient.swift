@@ -6,6 +6,7 @@ actor GatedHTTPClient: HTTPClient {
     private var isOpen: Bool
     private(set) var requestCount = 0
     private(set) var cancelledCount = 0
+    private(set) var priority: TaskPriority?
 
     init(_ response: StubHTTPClient.Response, isOpen: Bool = true) {
         self.response = response
@@ -26,6 +27,7 @@ actor GatedHTTPClient: HTTPClient {
             cancelledCount += 1
             throw error
         }
+        priority = Task.currentPriority
         return try response.result(for: request)
     }
 }
