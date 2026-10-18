@@ -5,7 +5,7 @@ import Testing
 struct PhotoRepositoryTests {
     private func makeRepository(_ response: StubHTTPClient.Response) -> (UnsplashPhotoRepository, StubHTTPClient) {
         let (api, client) = UnsplashAPI.stubbed(response)
-        return (UnsplashPhotoRepository(api: api), client)
+        return (UnsplashPhotoRepository(api: api, storeDirectory: TemporaryDirectory.make()), client)
     }
 
     @Test func repeatedSearchIsServedFromCache() async throws {

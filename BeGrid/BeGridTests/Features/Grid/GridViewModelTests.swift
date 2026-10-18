@@ -122,6 +122,43 @@ struct PhotoGridViewModelTests {
         #expect(await source.requestedPages == [1, 2, 2])
     }
 
+    @Test func reconnectingReplacesSavedPhotos() async {
+        let saved = Page(photos: [.stub(id: "old")], hasMore: true, isStale: true)
+        let source = ScriptedSource([1: [.success(saved), .success(.of("new"))]])
+        let model = PhotoGridViewModel(source: source)
+
+        await model.loadNextPage()
+        #expect(model.showsSavedPhotos)
+
+        await model.reconnect()
+
+        #expect(!model.showsSavedPhotos)
+        #expect(ids(model) == ["new"])
+        #expect(await source.requestedPages == [1, 1])
+    }
+
+    @Test func reconnectingRetriesAFailedLoad() async {
+        let source = ScriptedSource([1: [.success(.of("a"))], 2: [.failure(APIError.offline), .success(.of("b"))]])
+        let model = PhotoGridViewModel(source: source)
+        await model.loadNextPage()
+        await model.loadNextPage()
+
+        await model.reconnect()
+
+        #expect(ids(model) == ["a", "b"])
+        #expect(await source.requestedPages == [1, 2, 2])
+    }
+
+    @Test func reconnectingAFreshGridDoesNothing() async {
+        let source = ScriptedSource(pages: [.of("a"), .of("b")])
+        let model = PhotoGridViewModel(source: source)
+        await model.loadNextPage()
+
+        await model.reconnect()
+
+        #expect(await source.requestedPages == [1])
+    }
+
     @Test func unknownErrorIsReportedAsServerError() async {
         let model = PhotoGridViewModel(source: ScriptedSource([1: [.failure(Failure())]]))
 

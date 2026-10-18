@@ -1,6 +1,6 @@
 import Foundation
 
-nonisolated struct Photo: Identifiable, Hashable, Sendable {
+nonisolated struct Photo: Identifiable, Hashable, Codable, Sendable {
     static let defaultAspectRatio = 4.0 / 5.0
 
     let id: String

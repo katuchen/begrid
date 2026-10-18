@@ -4,6 +4,7 @@ struct RootView: View {
     @State private var feed: PhotoGridViewModel
     @State private var search: SearchViewModel
     @FocusState private var isSearchFocused: Bool
+    @Environment(\.isOnline) private var isOnline
 
     init(repository: any PhotoRepository) {
         _feed = State(initialValue: PhotoGridViewModel(source: repository.feedSource()))
@@ -24,6 +25,13 @@ struct RootView: View {
                 }
             }
             .animation(.easeInOut(duration: 0.25), value: search.results.map { ObjectIdentifier($0.grid) })
+            .safeAreaInset(edge: .bottom) {
+                if !isOnline {
+                    OfflineBanner()
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+            }
+            .animation(.easeInOut(duration: 0.25), value: isOnline)
             .scrollDismissesKeyboard(.immediately)
             .searchable(text: $search.query, prompt: "Search photos")
             .modifier(SearchFocus(isFocused: $isSearchFocused))

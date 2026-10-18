@@ -16,6 +16,7 @@ final class PhotoGridViewModel {
 
     private(set) var items: [Photo] = []
     private(set) var state: State = .idle
+    private(set) var showsSavedPhotos = false
 
     @ObservationIgnored private let source: any PhotoSource
     @ObservationIgnored private var seenIDs: Set<Photo.ID> = []
@@ -44,6 +45,14 @@ final class PhotoGridViewModel {
         guard case .failed = state else { return }
         state = items.isEmpty ? .idle : .loaded
         await loadNextPage()
+    }
+
+    func reconnect() async {
+        if showsSavedPhotos {
+            await refresh()
+        } else {
+            await retry()
+        }
     }
 
     func refresh() async {
@@ -83,6 +92,7 @@ final class PhotoGridViewModel {
             } else {
                 items.append(contentsOf: fresh)
             }
+            showsSavedPhotos = (showsSavedPhotos && !replacing) || page.isStale
             nextPage = number + 1
             state = page.hasMore ? .loaded : .exhausted
         } catch {

@@ -6,6 +6,11 @@ struct RemoteImage: View {
         let size: PixelSize
     }
 
+    private struct Attempt: Hashable {
+        let request: Request
+        let isOnline: Bool
+    }
+
     private struct Loaded {
         let request: Request
         let image: UIImage
@@ -18,6 +23,7 @@ struct RemoteImage: View {
     var preview: UIImage?
 
     @Environment(\.imageLoader) private var loader
+    @Environment(\.isOnline) private var isOnline
     @State private var loaded: Loaded?
     @State private var blur: UIImage?
 
@@ -54,7 +60,7 @@ struct RemoteImage: View {
                 guard let blurHash, preview == nil, image == nil else { return }
                 blur = await BlurHash.decodedImage(from: blurHash)
             }
-            .task(id: request) {
+            .task(id: Attempt(request: request, isOnline: isOnline)) {
                 await load(request)
             }
     }

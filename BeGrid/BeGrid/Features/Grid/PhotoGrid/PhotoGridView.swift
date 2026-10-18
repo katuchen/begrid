@@ -6,6 +6,7 @@ struct PhotoGridView<Empty: View>: View {
 
     @Environment(\.displayScale) private var displayScale
     @Environment(\.imageLoader) private var imageLoader
+    @Environment(\.isOnline) private var isOnline
     @State private var width: CGFloat = 0
     @State private var detail: PhotoDetailRoute?
     @State private var prefetcher = ImagePrefetcher()
@@ -24,6 +25,13 @@ struct PhotoGridView<Empty: View>: View {
             }
             .onDisappear {
                 prefetcher.cancelAll()
+            }
+            .onChange(of: isOnline) { _, isOnline in
+                guard isOnline else { return }
+                prefetcher.cancelAll()
+                Task {
+                    await model.reconnect()
+                }
             }
     }
 

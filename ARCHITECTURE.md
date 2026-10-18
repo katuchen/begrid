@@ -35,6 +35,7 @@ ImagePipeline: a standalone subsystem used by views
 | `Core/Networking/` | HTTP transport and Unsplash endpoint definitions |
 | `Core/Data/` | Repositories: the single source of photo data |
 | `Core/ImagePipeline/` | Image loading, caching, and sizing |
+| `Core/Connectivity/` | Network reachability, exposed to views as a plain value |
 | `Features/<Name>/` | One folder per screen or shared feature (`Grid`, `Feed`, `Search`, `Detail`) |
 | `DesignSystem/` | Reusable visual components with no business logic |
 
@@ -60,6 +61,10 @@ Image loading drives most of the app's performance, so it is a dedicated compone
 - downsampling to display size
 
 Views ask for an image at a size. How it is produced is hidden from them.
+
+### Offline falls back to saved pages
+
+The repository saves the first pages of the feed and of recent searches to disk. When a request fails, it returns the saved page, marked stale, instead of an error. Stale pages never enter the in-memory search cache, so the next attempt goes to the network. When connectivity returns, grids showing saved or failed content reload on their own. Images need nothing extra, because the pipeline reads its disk cache before the network.
 
 ### Views receive values, not view models
 

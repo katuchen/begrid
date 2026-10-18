@@ -16,7 +16,9 @@ nonisolated struct CachedSource: PhotoSource {
             return cached
         }
         let page = try await upstream.page(number)
-        await cache.insert(page, number: number, of: id)
+        if !page.isStale {
+            await cache.insert(page, number: number, of: id)
+        }
         return page
     }
 }
